@@ -591,7 +591,7 @@ bool WLED::initEthernet()
   }
 
   DEBUG_PRINT(F("initE: Attempting ETH config: ")); DEBUG_PRINTLN(ethernetType);
-
+#ifndef ARDUINO_ARCH_ESP32S3
   // Ethernet initialization should only succeed once -- else reboot required
   ethernet_settings es = ethernetBoards[ethernetType];
   managed_pin_type pinsToAllocate[10] = {
@@ -665,6 +665,46 @@ bool WLED::initEthernet()
     }
     return false;
   }
+
+  #elif defined (ARDUINO_ARCH_ESP32S3)
+
+  // SPI Pin configuration for LEDController_Gen3
+  #define ETH_MISO_PIN                    MISO
+  #define ETH_MOSI_PIN                    MOSI
+  #define ETH_SCLK_PIN                    SCK
+  #define ETH_CS_PIN                      8
+  #define ETH_INT_PIN                     18
+  #define ETH_RST_PIN                     17
+  #define ETH_ADDR                        1
+
+  // 7,6,5,4 and 41,42
+  // #define ETH_MISO_PIN                    41
+  // #define ETH_MOSI_PIN                    4
+  // #define ETH_SCLK_PIN                    5
+  // #define ETH_CS_PIN                      6
+  // #define ETH_INT_PIN                     7
+  // #define ETH_RST_PIN                     42
+  // #define ETH_ADDR                        1
+
+  managed_pin_type pinsToAllocate[12] = { ETH_MISO_PIN,true,ETH_MOSI_PIN,true,ETH_SCLK_PIN,true,ETH_CS_PIN,true,ETH_INT_PIN,true,ETH_RST_PIN,true };
+
+  if (!pinManager.allocateMultiplePins(pinsToAllocate, 6, PinOwner::Ethernet)) {
+    DEBUG_PRINTLN(F("initE: Failed to allocate ethernet pins"));
+    return false;
+  }
+
+  if (!ETH.begin(ETH_PHY_W5500, ETH_ADDR, ETH_CS_PIN, ETH_INT_PIN, ETH_RST_PIN, SPI3_HOST, ETH_SCLK_PIN, ETH_MISO_PIN, ETH_MOSI_PIN)) {
+    DEBUG_PRINTLN(F("initC: ETH.begin() [SPI Ethernet] failed"));
+    // de-allocate the allocated pins
+    for (managed_pin_type mpt : pinsToAllocate) {
+      pinManager.deallocatePin(mpt.pin, PinOwner::Ethernet);
+    }
+    return false;
+  } else {
+    Serial.println("ETH initialized W5500!");
+  }
+
+  #endif
 
   successfullyConfiguredEthernet = true;
   DEBUG_PRINTLN(F("initC: *** Ethernet successfully configured! ***"));
