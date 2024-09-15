@@ -274,12 +274,18 @@ void getSettingsJS(byte subPage, char* dest)
     sappends('s',SET_F("CP"),fpass);
 
     char k[3]; k[2] = 0; //IP addresses
+    char eth_k[4]; eth_k[0] = 'E'; eth_k[3] = 0;
     for (int i = 0; i<4; i++)
     {
       k[1] = 48+i; //ascii 0,1,2,3
       k[0] = 'I'; sappend('v',k,staticIP[i]);
       k[0] = 'G'; sappend('v',k,staticGateway[i]);
       k[0] = 'S'; sappend('v',k,staticSubnet[i]);
+
+      eth_k[2] = 48+i; //ascii 0,1,2,3
+      eth_k[1] = 'I'; sappend('v',eth_k,eth_staticIP[i]);
+      eth_k[1] = 'G'; sappend('v',eth_k,eth_staticGateway[i]);
+      eth_k[1] = 'S'; sappend('v',eth_k,eth_staticSubnet[i]);
     }
 
     sappends('s',SET_F("CM"),cmDNS);

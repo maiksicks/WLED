@@ -49,6 +49,7 @@ void handleSettingsSet(AsyncWebServerRequest *request, byte subPage)
     #endif
 
     char k[3]; k[2] = 0;
+    char eth_k[4]; eth_k[0] = 'E'; eth_k[3] = 0;
     for (int i = 0; i<4; i++)
     {
       k[1] = i+48;//ascii 0,1,2,3
@@ -61,6 +62,17 @@ void handleSettingsSet(AsyncWebServerRequest *request, byte subPage)
 
       k[0] = 'S'; //subnet
       staticSubnet[i] = request->arg(k).toInt();
+
+      eth_k[2] = i+48;//ascii 0,1,2,3
+
+      eth_k[1] = 'I'; //eth static IP
+      eth_staticIP[i] = request->arg(eth_k).toInt();
+
+      eth_k[1] = 'G'; //eth gateway
+      eth_staticGateway[i] = request->arg(eth_k).toInt();
+
+      eth_k[1] = 'S'; //eth subnet
+      eth_staticSubnet[i] = request->arg(eth_k).toInt();
     }
   }
 

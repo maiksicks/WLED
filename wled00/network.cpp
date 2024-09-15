@@ -164,8 +164,8 @@ void WiFiEvent(WiFiEvent_t event)
       if (!apActive) {
         WiFi.disconnect(true);
       }
-      if (staticIP != (uint32_t)0x00000000 && staticGateway != (uint32_t)0x00000000) {
-        ETH.config(staticIP, staticGateway, staticSubnet, IPAddress(8, 8, 8, 8));
+      if (eth_staticIP != (uint32_t)0x00000000 && eth_staticGateway != (uint32_t)0x00000000) {
+        ETH.config(eth_staticIP, eth_staticGateway, eth_staticSubnet, IPAddress(8, 8, 8, 8));
       } else {
         ETH.config(INADDR_NONE, INADDR_NONE, INADDR_NONE);
       }
