@@ -329,16 +329,16 @@ void WLED::setup()
   DEBUG_PRINT(F(", ")); DEBUG_PRINT(ESP.getChipCores()); DEBUG_PRINT(F(" core(s)"));
   DEBUG_PRINT(F(", ")); DEBUG_PRINT(ESP.getCpuFreqMHz()); DEBUG_PRINTLN(F("MHz."));
   DEBUG_PRINT(F("FLASH: ")); DEBUG_PRINT((ESP.getFlashChipSize()/1024)/1024);
-  DEBUG_PRINT(F("MB, Mode ")); DEBUG_PRINT(ESP.getFlashChipMode());
+  //DEBUG_PRINT(F("MB, Mode ")); DEBUG_PRINT(ESP.getFlashChipMode());
   #ifdef WLED_DEBUG
-  switch (ESP.getFlashChipMode()) {
-    // missing: Octal modes
-    case FM_QIO:  DEBUG_PRINT(F(" (QIO)")); break;
-    case FM_QOUT: DEBUG_PRINT(F(" (QOUT)"));break;
-    case FM_DIO:  DEBUG_PRINT(F(" (DIO)")); break;
-    case FM_DOUT: DEBUG_PRINT(F(" (DOUT)"));break;
-    default: break;
-  }
+  //switch (ESP.getFlashChipMode()) {
+  //  // missing: Octal modes
+  //  case FM_QIO:  DEBUG_PRINT(F(" (QIO)")); break;
+  //  case FM_QOUT: DEBUG_PRINT(F(" (QOUT)"));break;
+  //  case FM_DIO:  DEBUG_PRINT(F(" (DIO)")); break;
+  //  case FM_DOUT: DEBUG_PRINT(F(" (DOUT)"));break;
+  //  default: break;
+  //}
   #endif
   DEBUG_PRINT(F(", speed ")); DEBUG_PRINT(ESP.getFlashChipSpeed()/1000000);DEBUG_PRINTLN(F("MHz."));
 
