@@ -140,18 +140,33 @@ void appendGPIOinfo() {
   }
   oappend(SET_F("];"));
 
-  // add reserved and usermod pins as d.um_p array
-  #if defined(CONFIG_IDF_TARGET_ESP32S2)
-  oappend(SET_F("d.rsvd=[22,23,24,25,26,27,28,29,30,31,32"));
-  #elif defined(CONFIG_IDF_TARGET_ESP32S3)
-  oappend(SET_F("d.rsvd=[19,20,22,23,24,25,26,27,28,29,30,31,32"));  // includes 19+20 for USB OTG (JTAG)
-  #elif defined(CONFIG_IDF_TARGET_ESP32C3)
-  oappend(SET_F("d.rsvd=[11,12,13,14,15,16,17"));
-  #elif defined(ESP32)
-  oappend(SET_F("d.rsvd=[6,7,8,9,10,11,24,28,29,30,31,37,38"));
+  //WLEDMM: use isPinOK instead of hardcoded pins
+  char rsvd[140] = "d.rsvd=[";
+  size_t rsLen = strlen(rsvd);
+  char ro_gpio[140] = "d.ro_gpio=[";
+  size_t roLen = strlen(ro_gpio);
+  char pinString[10];
+  for(int pinNr = 0; pinNr < WLED_NUM_PINS; pinNr++) { // 49 = highest PIN on ESP32-S3
+  #if defined(ARDUINO_ARCH_ESP32) && !defined(BOARD_HAS_PSRAM)
+    if ((!pinManager.isPinOk(pinNr, false)) || (pinManager.getPinOwner(pinNr) == PinOwner::SPI_RAM)) {  // WLEDMM add SPIRAM pins as "reserved" (pico boards)
   #else
-  oappend(SET_F("d.rsvd=[6,7,8,9,10,11"));
+    if (!pinManager.isPinOk(pinNr, false)) {
   #endif
+      sprintf(pinString, "%s%d", strlen(rsvd)==rsLen?"":",", pinNr);
+      strcat(rsvd, pinString);
+    }
+    else {
+      //if ((!pinManager.isPinAllocated(pinNr)) && (pinManager.getPinSpecialText(pinNr).length() == 0)) continue;      // un-comment to hide no-name,unused GPIO pins
+      bool is_inOut = pinManager.isPinOk(pinNr, true);
+      if (!is_inOut) {
+        sprintf(pinString, "%s%d", strlen(ro_gpio)==roLen?"":",", pinNr);
+        strcat(ro_gpio, pinString);
+      }
+    }
+  }
+
+  // add reserved and usermod pins as d.um_p array
+  oappend(rsvd);
 
   #ifdef WLED_ENABLE_DMX
   oappend(SET_F(",2")); // DMX hardcoded pin
