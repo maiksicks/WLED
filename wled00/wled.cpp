@@ -702,6 +702,7 @@ bool WLED::initEthernet()
     return false;
   } else {
     Serial.println("ETH initialized W5500!");
+    WiFiEvent((WiFiEvent_t) SYSTEM_EVENT_ETH_CONNECTED);
   }
 
   #endif
